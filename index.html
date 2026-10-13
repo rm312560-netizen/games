@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="遊戲指南">
+<meta name="description" content="新遊戲、排行榜、台灣價格與販售、YouTube 評測 AI 整理、系列前作導引">
+<title>遊戲指南</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="icons/icon-192.png" alt=""><b>遊戲指南</b><span class="muted small" id="upd"></span></div>
+  <nav class="tabs" id="tabs">
+    <button data-t="home" aria-current="page">首頁</button>
+    <button data-t="rank">排行</button>
+    <button data-t="find">找遊戲</button>
+    <button data-t="admin" id="adminTab" hidden>管理</button>
+  </nav>
+</header>
+<div id="offline" class="offline" hidden></div>
+<main id="main"><p class="empty">載入中…</p></main>
+
+<!-- 遊戲頁 -->
+<div id="sheet" class="sheet" hidden><button class="back" id="sheetBack">‹ 返回</button><div id="sheetBody"></div></div>
+<!-- 底部對話框 -->
+<div id="dlg" class="dlg" hidden><div class="box" id="dlgBox"></div></div>
+<div id="toast" class="toast" hidden></div>
+<nav class="tabbar" id="tabbar">
+  <button data-t="home" aria-current="page"><span>⌂</span>首頁</button>
+  <button data-t="rank"><span>☰</span>排行</button>
+  <button data-t="find"><span>⌕</span>找遊戲</button>
+  <button data-t="more"><span>⋯</span>更多</button>
+</nav>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
