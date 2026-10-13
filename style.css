@@ -110,3 +110,7 @@ select { background: var(--panel); border: 1px solid var(--line); border-radius:
 .panel h3 { margin: 0 0 8px; font-size: 1rem; }
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; } .row input[type=text], .row input[type=password] { flex: 1; min-width: 200px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
 .log { font-family: Consolas, monospace; font-size: .76rem; color: var(--muted); max-height: 180px; overflow-y: auto; white-space: pre-wrap; }
+/* 用滑鼠的電腦：分類標籤自動換行，全部看得到（手機維持左右滑） */
+@media (hover: hover) and (pointer: fine) {
+  .chips.scroll { flex-wrap: wrap; overflow-x: visible; }
+}

@@ -1,5 +1,5 @@
 // 遊戲指南網頁：公開版（GitHub Pages，從轉接站讀資料包）與電腦版（localhost:8780，管理員）共用
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.0.2';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const toast = m => { const t = $('toast'); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 2800); };
@@ -316,6 +316,9 @@ async function renderAdmin() {
   $('aSave').onclick = async () => { await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ autoPicks: $('aPicks').checked, autoReviews: $('aRev').checked, autoGuides: $('aGuide').checked, reviewVideos: $('aVids').value, maxGames: $('aMax').value }) }); $('aMsg').textContent = '已儲存'; };
   $('aPair').onclick = async () => { try { const r = await (await fetch('/api/pair', { method: 'POST' })).json(); $('aCode').textContent = r.code || r.error || ''; } catch (e) { toast(e.message); } };
 }
+
+// 標籤列：滑鼠滾輪也可以左右捲動
+document.addEventListener('wheel', e => { const c = e.target.closest('.chips.scroll'); if (c && c.scrollWidth > c.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX)) { c.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive: false });
 
 // ---------- 啟動 ----------
 (async () => {
