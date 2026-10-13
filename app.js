@@ -1,5 +1,5 @@
 // 遊戲指南網頁：公開版（GitHub Pages，從轉接站讀資料包）與電腦版（localhost:8780，管理員）共用
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.0.1';
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const toast = m => { const t = $('toast'); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 2800); };
@@ -109,7 +109,7 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-pk]'
 // ---------- 排行 ----------
 const RANKS = [
   ['baha_pre', '台灣預購（巴哈商城）'], ['steam_top', 'Steam 熱銷（台灣）'], ['ps_best', 'PS Store 暢銷（台灣）'], ['steam_played', 'Steam 同時在線'], ['ps_new', 'PS Store 新上架'],
-  ['steam_new', 'Steam 新作'], ['steam_coming', 'Steam 即將推出'], ['famitsu', '日本實體銷量（Fami 通）'], ['twitch', 'Twitch 直播熱度'], ['igdb_want', '最多人想玩（IGDB）'], ['apple', '手遊營收（App Store 台灣）'], ['apple_free', '手遊免費榜'],
+  ['steam_new', 'Steam 新作'], ['steam_coming', 'Steam 即將推出'], ['famitsu', '日本實體銷量（Fami 通）'], ['twitch', 'Twitch 直播熱度'], ['igdb_want', '最多人想玩（IGDB）'],
 ];
 function renderRank() {
   const k = S.rk && D.charts[S.rk] ? S.rk : 'baha_pre';
@@ -124,7 +124,7 @@ function renderRank() {
     <div>${list.map(x => { const g = G(x.id), img = g ? imgOf(g) : x.img || '';
       const inner = `<div class="n">${x.r}</div><div class="img" style="background-image:url('${esc(img)}')"></div><div><div class="t">${esc(g?.n || x.n || '')}</div><div class="s">${g ? `${esc(relTxt(g))} ${platsHtml(g.plats)}` : esc([x.plat, x.maker || x.dev].filter(Boolean).join('・'))}</div></div><div class="v">${val(x)}</div>`;
       return g ? `<div class="rk" data-g="${x.id}">${inner}</div>` : x.url ? `<a class="rk" href="${esc(x.url)}" target="_blank" rel="noopener" style="color:inherit">${inner}</a>` : `<div class="rk">${inner}</div>`; }).join('') || '<p class="empty">沒有資料</p>'}</div>
-    <p class="muted small">排行每 6 小時更新。${k.startsWith('apple') ? '手遊排行點名稱會開 App Store。' : ''}</p>`;
+    <p class="muted small">排行每 6 小時更新；不收網路遊戲、手機遊戲。</p>`;
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-rk]'); if (b) { S.rk = b.dataset.rk; saveS(); renderRank(); } });
 
@@ -135,14 +135,14 @@ function renderFind() {
   const genres = Object.entries(all.reduce((m, [, g]) => { for (const x of g.g || []) m[x] = (m[x] || 0) + 1; return m; }, {})).sort((a, b) => b[1] - a[1]).slice(0, 16).map(([k]) => k);
   const q = F.q.trim().toLowerCase();
   let list = all.filter(([, g]) => (!q || `${g.n} ${g.en || ''} ${(g.dev || []).join(' ')} ${(g.pub || []).join(' ')}`.toLowerCase().includes(q))
-    && (!F.plat || (g.plats || []).some(p => p === F.plat || (F.plat === 'Switch' && /Switch/.test(p)) || (F.plat === 'Xbox' && /Xbox/.test(p)) || (F.plat === '手機' && /iOS|Android/.test(p))))
+    && (!F.plat || (g.plats || []).some(p => p === F.plat || (F.plat === 'Switch' && /Switch/.test(p)) || (F.plat === 'Xbox' && /Xbox/.test(p))))
     && (!F.genre || (g.g || []).includes(F.genre)) && (!F.zh || g.zh) && (!F.maxP || (priceOf(g) != null && priceOf(g) <= +F.maxP))
     && (!F.when || (F.when === 'up' ? isUpcoming(g) : !isUpcoming(g))));
   const by = { hot: () => 0, rate: ([, a], [, b]) => (b.steam?.rev?.pct ?? b.rating ?? 0) - (a.steam?.rev?.pct ?? a.rating ?? 0), new: ([, a], [, b]) => String(b.rel || '').localeCompare(String(a.rel || '')), price: ([, a], [, b]) => (priceOf(a) ?? 1e9) - (priceOf(b) ?? 1e9) };
   if (F.sort !== 'hot') list = [...list].sort(by[F.sort]);
   const chip = (k, v, t) => `<button class="chip" data-f="${k}" data-v="${esc(v)}" aria-pressed="${String(F[k]) === String(v)}">${esc(t)}</button>`;
   if (!$('fq')) $('main').innerHTML = `<div class="filters"><input class="search" id="fq" placeholder="搜尋遊戲、公司…" autocomplete="off"><div id="fbar"></div></div><div id="flist"></div>`;
-  $('fbar').innerHTML = `<div class="chips scroll">${chip('plat', '', '全部平台')}${['PC', 'PS5', 'Switch', 'Xbox', '手機'].map(p => chip('plat', p, p === 'Switch' ? 'Switch／Switch 2' : p)).join('')}</div>
+  $('fbar').innerHTML = `<div class="chips scroll">${chip('plat', '', '全部平台')}${['PC', 'PS5', 'Switch', 'Xbox'].map(p => chip('plat', p, p === 'Switch' ? 'Switch／Switch 2' : p)).join('')}</div>
     <div class="chips scroll" style="margin-top:6px">${chip('genre', '', '全部種類')}${genres.map(x => chip('genre', x, x)).join('')}</div>
     <div class="frow" style="margin-top:6px">${chip('when', '', '全部')}${chip('when', 'up', '即將上市')}${chip('when', 'out', '已上市')}
       <label class="chip" style="cursor:pointer"><input type="checkbox" id="fzh" ${F.zh ? 'checked' : ''}> 有中文</label>
@@ -170,8 +170,6 @@ function storeRows(g) {
   else if ((g.plats || []).some(p => /Switch/.test(p))) rows.push(['任天堂 eShop（港台）', `https://store.nintendo.com.hk/catalogsearch/result/?q=${q}`, '搜尋', '', '港台']);
   if (g.gp) rows.push(['Xbox（Game Pass）', g.gp.url, g.gp.price ? `NT$${fmt(g.gp.price)}・Game Pass 可玩` : 'Game Pass 可玩', '', '台灣']);
   else if ((g.plats || []).some(p => /Xbox/.test(p))) rows.push(['Xbox Store', `https://www.xbox.com/zh-TW/search/results/games?q=${qe}`, '搜尋', '', '台灣']);
-  if ((g.plats || []).includes('iOS')) rows.push(['App Store', `https://apps.apple.com/tw/search?term=${q}`, '搜尋', '', '台灣']);
-  if ((g.plats || []).includes('Android')) rows.push(['Google Play', `https://play.google.com/store/search?q=${q}&c=apps`, '搜尋', '', '台灣']);
   return rows;
 }
 function openGame(id, keep = false) {
